@@ -1,0 +1,56 @@
+version: '3.3'
+
+services:
+    nginx:
+        image: nginx:latest
+        container_name: nginx
+        ports:
+            - "80:80"
+        networks:
+            - proxy
+        volumes:
+            - ../:/var/www/html
+            - ./nginx/conf:/etc/nginx/conf.d
+            - ./nginx/logs:/var/log/nginx/
+        depends_on:
+            - restaurantapp
+
+    restaurantapp:
+        build: ./php
+        container_name: restaurantapp
+        networks:
+            - backend
+            - proxy
+        volumes:
+            - ../:/var/www/html
+        depends_on:
+            - db
+            - redis
+        links:
+            - db
+            - redis
+
+    redis:
+        container_name: redis
+        image: redis
+        command: redis-server --requirepass pass123
+        ports:
+            - "6379:6379"
+
+    db:
+        container_name: db
+        image: mysql:5.7
+        restart: always
+        expose:
+            - 3306
+        ports:
+            - "3306:3306"
+        networks:
+            - backend
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=baserestaurantapp
+
+networks:
+    backend:
+    proxy:

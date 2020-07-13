@@ -1,0 +1,7 @@
+vendor
+.idea
+/docker/nginx/logs/*.log
+/docker/nginx/logs/*.log
+.env
+build
+doc.txt
